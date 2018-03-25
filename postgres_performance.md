@@ -57,7 +57,7 @@ SELECT
   round(mean_time::numeric, 2) AS mean_time,
   round((100 * total_time / sum(total_time::numeric) OVER ())::numeric, 2) AS percentage_cpu
 FROM pg_stat_statements
-ORDER BY round(mean_time::numeric, 2) DESC
+ORDER BY 4 DESC
 LIMIT 5;
 
 # result, all time in miliseconds
