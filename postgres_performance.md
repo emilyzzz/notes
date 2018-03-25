@@ -1,5 +1,37 @@
 ## Postgres 9.6
 
+### Current Running Queries
+```
+SELECT 
+  pid, 
+  age(query_start, clock_timestamp()), 
+  usename, 
+  substring(query, 1, 50) as query
+FROM pg_stat_activity
+WHERE 
+  query NOT IN ('<IDLE>', 'DISCARD ALL', 'COMMIT', 'BEGIN') AND 
+  query NOT ILIKE '%pg_stat_activity%' AND
+  age(query_start, clock_timestamp()) IS NOT null 
+ORDER BY query_start
+LIMIT 10;
+
+┌───────┬───────────────────────────────────┬─────────┬────────────────────────────────────────────────────┐
+│  pid  │                age                │ usename │                       query                        │
+├───────┼───────────────────────────────────┼─────────┼────────────────────────────────────────────────────┤
+│  8746 │ -1 mons -12 days -00:13:10.731727 │ user    │                                                   ↵│
+│       │                                   │         │ SELECT                                            ↵│
+│       │                                   │         │                 cons.conname a                     │
+│ 23862 │ -00:00:00.020595                  │ user    │ SELECT user.full -> 'id' AS id                    ↵│
+│       │                                   │         │ FROM user                                         ↵│
+│       │                                   │         │                                                    │
+│ 22195 │ -00:00:00.009927                  │ user    │ SELECT t.oid, typarray                            ↵│
+│       │                                   │         │ FROM pg_type t JOIN pg_name                        │
+│ 20435 │ -00:00:00.001915                  │ user    │ show standard_conforming_strings                   │
+│ 25780 │ -00:00:00.001306                  │ user    │ show standard_conforming_strings                   │
+│ 21801 │ -00:00:00.001263                  │ user    │ show standard_conforming_strings                   │
+│  1096 │ -00:00:00.000439                  │ user    │ SELECT CAST('test plain returns' AS VARCHAR(60)) A │
+└───────┴───────────────────────────────────┴─────────┴────────────────────────────────────────────────────┘
+```
 
 
 ### PG_STAT_STATEMENT
@@ -17,7 +49,6 @@ pg_stat_statements.track = 'top'
 ```
 
 
-**Query**
 ```
 SELECT 
   substring(query, 1, 50) || '...' AS query,
@@ -28,12 +59,8 @@ SELECT
 FROM pg_stat_statements
 ORDER BY round(mean_time::numeric, 2) DESC
 LIMIT 5;
-```
 
-
-**Result** 
-_all time in miliseconds_
-```
+# result, all time in miliseconds
 ┌───────────────────────────────────────────────────────┬───────────────┬───────┬───────────┬────────────────┐
 │                         query                         │  total_time   │ calls │ mean_time │ percentage_cpu │
 ├───────────────────────────────────────────────────────┼───────────────┼───────┼───────────┼────────────────┤
