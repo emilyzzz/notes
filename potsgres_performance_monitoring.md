@@ -164,11 +164,12 @@ pg_stat_statements.track = 'top'
 
 # Restart Postgres after conf change.
 
-# reset to empty
+# reset stats to empty
 select pg_stat_statements_reset();
 ```
 
 
+**Example 1: Slowest by Mean Time**
 ```
 SELECT 
   substring(query, 1, 50) || '...' AS query,
@@ -198,6 +199,60 @@ LIMIT 5;
 │                                                       │               │       │           │                │
 └───────────────────────────────────────────────────────┴───────────────┴───────┴───────────┴────────────────┘
 ```
+
+**Example 2: Shared Block Hit Rate by Query**
+```
+# top 20 queries having low cache hit rate
+
+SELECT substring(query, 1, 50) || '...' || E'\n' AS query,
+  calls,
+  total_time,
+  rows,
+  100.0 * shared_blks_hit / nullif(shared_blks_hit + shared_blks_read, 0) AS shared_hit_percent
+FROM pg_stat_statements
+ORDER BY 5 ASC NULLS LAST LIMIT 20;
+```
+
+**Example 3: Slowest Queries**
+```
+SELECT substring(query, 1, 100) || '...' || E'\n' AS query,
+  calls,
+  total_time,
+  rows,
+  max_time
+FROM pg_stat_statements
+ORDER BY 5 DESC LIMIT 20;
+```
+
+**Example 4: Slowest Queries, Aggregated**
+```
+SELECT substring(query, 1, 50) || '...' || E'\n' AS query,
+  max(max_time)
+FROM pg_stat_statements
+GROUP BY 1
+ORDER BY 2 DESC LIMIT 20;
+```
+
+**Example 5: Slowest Inserts**
+```
+SELECT substring(query, 1, 50) || '...' || E'\n' AS query,
+  max(max_time)
+FROM pg_stat_statements
+WHERE query LIKE 'INSERT INTO%'
+GROUP BY 1
+ORDER BY 2 DESC LIMIT 20;
+```
+
+**Example 6: Slowest Average Inserts**
+```
+SELECT substring(query, 1, 50) || '...' || E'\n' AS query,
+  round(AVG(mean_time)::numeric, 2)
+FROM pg_stat_statements
+WHERE query LIKE 'INSERT INTO%'
+GROUP BY 1
+ORDER BY 2 DESC LIMIT 20;
+```
+
 
 #### Missing Index:: pg_stat_all_tables
 ```
