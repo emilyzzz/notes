@@ -36,13 +36,14 @@ https://github.com/2ndquadrant-it/barman
 * sudo barman list-server (optional: --minimal)
 * sudo barman check all
 * sudo barman cron
-* sudo barman check SERVER_NAME
-* sudo barman receive-wal --stop SERVER_NAME
-* sudo barman backup SERVER_NAME
+* sudo barman check \<server_name\>
+* sudo barman receive-wal --stop \<server_name\>
+* sudo barman backup \<server_name\>
 * sudo barman diagnose: generate a json of system info
-* sudo barman recover **server_name** **backup_id** /path/to/recover/dir
-* sudo barman show-backup **server_name** **backup_id**
-* sudo barman replication-status qa_api
+* sudo barman recover \<server_name\> **backup_id** /path/to/recover/dir
+* sudo barman show-backup \<server_name\> **backup_id**
+* sudo barman replication-status \<server_name\>
+* sudo barman list-backup \<server_name\>
 
 #### Network
 * tablespace_bandwidth_limit = tbname:bwlimit[, tbname:bwlimit, ...]

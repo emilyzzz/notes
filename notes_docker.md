@@ -25,10 +25,14 @@
 * docker volume ls -qf dangling=true
 * docker volume ls -qf dangling=true | xargs docker volume rm
   * -f: filter, -q: quiet
+* docker rmi $(docker image ls -q)
+  * will delete all images, for clean up purposes
 * docker images | grep '"'"'<none>'"'"' | awk '"'"'{print $3}'"'"' | xargs docker rmi
   * -a: all, -q: quiet, -f: filter
+  * dockviz images --tree
+  * docker image inspect
 * docker network ls
-* dockviz images --tree
+
 * docker run -it --rm
 * ls -lh ~/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/Docker.qcow2
 * docker ps --format '{{.Names}}'
